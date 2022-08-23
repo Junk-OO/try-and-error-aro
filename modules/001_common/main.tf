@@ -66,3 +66,28 @@ resource "azurerm_subnet" "subnet-vm-tf-001" {
   service_endpoints = []
   private_link_service_network_policies_enabled = false
 }
+
+###
+# NSG
+###
+resource "azurerm_network_security_group" "nsg-vm-tf-001" {
+  name                = "nsg-vm-tf-001"
+  location            = azurerm_resource_group.rg-vm-tf-001.location
+  resource_group_name = azurerm_resource_group.rg-vm-tf-001.name
+
+  dynamic "security_rule" {
+    for_each = local.nsg-vm-tf-001.security_rule
+
+    content {
+      name                         = security_rule.value[0]
+      priority                     = security_rule.value[1]
+      direction                    = security_rule.value[2]
+      access                       = security_rule.value[3]
+      protocol                     = security_rule.value[4]
+      source_port_range            = security_rule.value[5]
+      destination_port_range       = security_rule.value[6]
+      source_address_prefix        = security_rule.value[7]
+      destination_address_prefix   = security_rule.value[8]
+    }
+  }
+}
